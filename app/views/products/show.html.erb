@@ -1,2 +1,39 @@
 <h1>Products#show</h1>
 <p>Find me in app/views/products/show.html.erb</p>
+
+<!-- app/views/products/show.html.erb -->
+
+<div class="container mt-5">
+  <h1 class="display-4"><%= @product.name %></h1>
+
+  <div class="row">
+    <div class="col-md-6">
+      <% if @product.image.present?%>
+        <%= image_tag @product.image, alt: 'Product Image', class: 'img-fluid mb-3' %>
+      <%else%>
+        <p>No Image Found</p>
+      <%end%>
+    </div>
+
+    <div class="col-md-6">
+      <p><strong>Description:</strong> <%= @product.description %></p>
+      <p><strong>Price:</strong> <%= number_to_currency(@product.price) %></p>
+      <p><strong>Quantity Available:</strong> <%= @product.quantity_available %></p>
+      <p><strong>Material:</strong> <%= @product.material %></p>
+
+      <%= link_to 'Back to Products', products_path, class: 'btn btn-secondary mt-3' %>
+    </div>
+  </div>
+</div>
+
+
+<!-- app/views/products/show.html.erb -->
+<h1><%= @product.name %></h1>
+
+<% if user_signed_in? %>
+  <% if current_user.favorited_products.include?(@product) %>
+    <%= button_to 'Remove from Favorites', unfavorite_product_path(@product), method: :delete, class: 'btn btn-danger' %>
+  <% else %>
+    <%= link_to 'Add to Favorites', favorite_product_path(@product), method: :post, class: 'btn btn-primary' %>
+  <% end %>
+<% end %>
