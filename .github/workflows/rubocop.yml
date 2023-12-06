@@ -5,7 +5,7 @@ name: RuboCop
 on:
   pull_request:
     branches:
-      - main
+      - master
 
 jobs:
   rubocop:
@@ -13,9 +13,20 @@ jobs:
 
     steps:
 
-    - name: Install dependencies
+    - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Ruby
+        uses: actions/setup-ruby@v2
+        with:
+          ruby-version: 3.0.0
+
+      - name: Install Bundler
+        run: gem install bundler
+      
+      - name: Install dependencies
       run: |
-        gem install bundler
+        bundle config set path vendor/bundle
         bundle install
 
     - name: Database configuration
