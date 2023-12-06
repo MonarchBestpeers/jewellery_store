@@ -1,0 +1,737 @@
+# Load plugins
+require:
+  # - rubocop-performance
+  # - rubocop-rspec
+  - rubocop-rails
+
+# Inherit from some other config files before we define our own configuration here
+inherit_from:
+  # Our todo list of exclusions
+  - .rubocop_todo_internal.yml
+
+# The behavior of RuboCop can be controlled via the .rubocop.yml
+# configuration file. It makes it possible to enable/disable
+# certain cops (checks) and to alter their behavior if they accept
+# any parameters. The file can be placed either in your home
+# directory or in some project directory.
+#
+# RuboCop will start looking for the configuration file in the directory
+# where the inspected file is and continue its way up to the root directory.
+#
+# See https://github.com/rubocop-hq/rubocop/blob/master/manual/configuration.md
+
+# These apply to all checks, and are helpful to exclude specific directories from being inspected
+AllCops:
+  SuggestExtensions: false
+  NewCops: enable
+  RubyInterpreters:
+    - ruby
+    - rake
+  TargetRailsVersion: 4.2
+  Exclude:
+    # Default exclude: git
+    - '.git/**/*'
+    # Ignore our random scripts directory
+    - 'assets/**/*'
+    # Ignore logs
+    - 'log/**/*'
+    # Default exclude: node
+    - 'node_modules/**/*'
+    # Temp files are not useful to check
+    - 'tmp/**/*'
+    # Default exclude: vendor
+    - 'vendor/**/*'
+    # Old migrations get a free pass on some checks because they have already run.
+    # Starting from July 2019, migrations should pass Rubocop sanity checks.
+    - 'db/migrate/201{6,7,8}*.rb'
+    - 'db/migrate/20190{1,2,3,4,5,6}*.rb'
+    # Migration version number is a long integer which is generated, so ignore it.
+    - 'db/schema.rb'
+    # Mostly a data dump for tests, ignore it
+    - 'db/seeds.rb'
+
+Rails/Output:
+  Exclude:
+    - 'db/migrate/*.rb'
+    - 'db/*.rb'
+
+#
+# Our own style conventions and exceptions
+# A good convention is to copy the entire rule from .rubocop_default.yml and then modify it
+#
+
+# This is not a "real" Rails application, so we're bypassing some of its conventions such as this one.
+Rails/ApplicationRecord:
+  Enabled: false
+
+# While documentation is helpful, it is less helpful require'ing it in a legacy codebase.
+Style/Documentation:
+  Description: 'Document classes and non-namespace modules.'
+  Enabled: false
+  VersionAdded: '0.9'
+  Exclude:
+    - 'spec/**/*'
+    - 'test/**/*'
+
+Style/ClassAndModuleChildren:
+  Description: 'Checks style of children classes and modules.'
+  StyleGuide: '#namespace-definition'
+  # Moving from compact to nested children requires knowledge of whether the
+  # outer parent is a module or a class. Moving from nested to compact requires
+  # verification that the outer parent is defined elsewhere. Rubocop does not
+  # have the knowledge to perform either operation safely and thus requires
+  # manual oversight.
+  SafeAutoCorrect: false
+  AutoCorrect: false
+  Enabled: false
+  VersionAdded: '0.19'
+  #
+  # Basically there are two different styles:
+  #
+  # `nested` - have each child on a separate line
+  #   class Foo
+  #     class Bar
+  #     end
+  #   end
+  #
+  # `compact` - combine definitions as much as possible
+  #   class Foo::Bar
+  #   end
+  #
+  # The compact style is only forced, for classes or modules with one child.
+  EnforcedStyle: compact
+  SupportedStyles:
+    - nested
+    - compact
+
+Lint/Void:
+  Exclude:
+    # Classic foo.should == bar checks trigger this, but are valid
+    - 'spec/**/*_spec.rb'
+
+Style/SymbolArray:
+  Description: 'Use %i or %I for arrays of symbols.'
+  StyleGuide: '#percent-i'
+  Enabled: true
+  VersionAdded: '0.9'
+  VersionChanged: '0.49'
+  EnforcedStyle: brackets
+  MinSize: 2
+  SupportedStyles:
+    - percent
+    - brackets
+
+Style/HashSyntax:
+  Description: >-
+    Prefer Ruby 1.9 hash syntax { a: 1, b: 2 } over 1.8 syntax
+    { :a => 1, :b => 2 }.
+  StyleGuide: '#hash-literals'
+  Enabled: true
+  VersionAdded: '0.9'
+  VersionChanged: '0.43'
+  EnforcedStyle: ruby19_no_mixed_keys
+  SupportedStyles:
+    # checks for 1.9 syntax (e.g. {a: 1}) for all symbol keys
+    - ruby19
+    # checks for hash rocket syntax for all hashes
+    - hash_rockets
+    # forbids mixed key syntaxes (e.g. {a: 1, :b => 2})
+    - no_mixed_keys
+    # enforces both ruby19 and no_mixed_keys styles
+    - ruby19_no_mixed_keys
+  # Force hashes that have a symbol value to use hash rockets
+  UseHashRocketsWithSymbolValues: false
+  # Do not suggest { a?: 1 } over { :a? => 1 } in ruby19 style
+  PreferHashRocketsForNonAlnumEndingSymbols: false
+
+Layout/ExtraSpacing:
+  Description: 'Do not use unnecessary spacing.'
+  Enabled: true
+  VersionAdded: '0.49'
+  # When true, allows most uses of extra spacing if the intent is to align
+  # things with the previous or next line, not counting empty lines or comment
+  # lines.
+  AllowForAlignment: false
+  # When true, allows things like 'obj.meth(arg)  # comment',
+  # rather than insisting on 'obj.meth(arg) # comment'.
+  # If done for alignment, either this OR AllowForAlignment will allow it.
+  AllowBeforeTrailingComments: false
+  # When true, forces the alignment of `=` in assignments on consecutive lines.
+  ForceEqualSignAlignment: false
+
+Rails/Exit:
+  Description: >-
+    Favor `fail`, `break`, `return`, etc. over `exit` in
+    application or library code outside of Rake files to avoid
+    exits during unit testing or running in production.
+  Enabled: true
+  VersionAdded: '0.41'
+  Include:
+    - app/**/*.rb
+    - config/**/*.rb
+    - lib/**/*.rb
+  Exclude:
+    - lib/**/*.rake
+    # These are executable scripts or the bases for them; exit is allowed.
+    - lib/orsedd/contract_state_change_stat.rb
+    - lib/orsedd/daemon.rb
+    # These are executables; exit is allowed
+    - bin/*
+
+# Empty else with a comment explaining _why_ no action is required
+# can be very helpful to explain your logic to future readers.
+Style/EmptyElse:
+  Description: 'Avoid empty else-clauses.'
+  Enabled: false
+  VersionAdded: '0.28'
+  VersionChanged: '0.32'
+  EnforcedStyle: both
+  # empty - warn only on empty `else`
+  # nil - warn on `else` with nil in it
+  # both - warn on empty `else` and `else` with `nil` in it
+  SupportedStyles:
+    - empty
+    - nil
+    - both
+
+Layout/MultilineAssignmentLayout:
+  Description: 'Check for a newline after the assignment operator in multi-line assignments.'
+  StyleGuide: '#indent-conditional-assignment'
+  Enabled: true
+  VersionAdded: '0.49'
+  # The types of assignments which are subject to this rule.
+  SupportedTypes:
+    - block
+    - case
+    - class
+    - if
+    - kwbegin
+    - module
+  EnforcedStyle: new_line
+  SupportedStyles:
+    # Ensures that the assignment operator and the rhs are on the same line for
+    # the set of supported types.
+    - same_line
+    # Ensures that the assignment operator and the rhs are on separate lines
+    # for the set of supported types.
+    - new_line
+
+Layout/EndAlignment:
+  Description: 'Align ends correctly.'
+  Enabled: true
+  VersionAdded: '0.53'
+  # The value `keyword` means that `end` should be aligned with the matching
+  # keyword (`if`, `while`, etc.).
+  # The value `variable` means that in assignments, `end` should be aligned
+  # with the start of the variable on the left hand side of `=`. In all other
+  # situations, `end` should still be aligned with the keyword.
+  # The value `start_of_line` means that `end` should be aligned with the start
+  # of the line which the matching keyword appears on.
+  EnforcedStyleAlignWith: keyword
+  SupportedStylesAlignWith:
+    - keyword
+    - variable
+    - start_of_line
+  AutoCorrect: true
+  Severity: warning
+
+Layout/DefEndAlignment:
+  Description: 'Align ends corresponding to defs correctly.'
+  Enabled: true
+  VersionAdded: '0.53'
+  # The value `def` means that `end` should be aligned with the def keyword.
+  # The value `start_of_line` means that `end` should be aligned with method
+  # calls like `private`, `public`, etc, if present in front of the `def`
+  # keyword on the same line.
+  EnforcedStyleAlignWith: def
+  SupportedStylesAlignWith:
+    - start_of_line
+    - def
+  AutoCorrect: true
+  Severity: warning
+
+Layout/MultilineMethodCallIndentation:
+  Description: >-
+    Checks indentation of method calls with the dot operator
+    that span more than one line.
+  Enabled: true
+  VersionAdded: '0.49'
+  EnforcedStyle: indented
+  SupportedStyles:
+    - aligned
+    - indented
+    - indented_relative_to_receiver
+  # By default, the indentation width from Layout/IndentationWidth is used
+  # But it can be overridden by setting this parameter
+  IndentationWidth: ~
+
+# Using classes as reference serves as a double check that it actually exists
+Rails/ReflectionClassName:
+  Description: 'Use a string for `class_name` option value in the definition of a reflection.'
+  Enabled: false
+  VersionAdded: '0.64'
+
+# Empty when branches with a comment can serve to document valid input
+Lint/EmptyWhen:
+  Description: 'Checks for `when` branches with empty bodies.'
+  Enabled: false
+  VersionAdded: '0.45'
+
+# Usually this rule is right, but a few times the before(:all) is helpful.
+# RSpec/BeforeAfterAll:
+#   Exclude:
+#     - spec/unit/plugin/status/health_check_handler_spec.rb
+#     - spec/unit/serializer/json_spec.rb
+#     - spec/unit/serializer/yaml_spec.rb
+#     - spec/unit/queue_backend/queue_envelope_spec.rb
+#     - spec/spec_helper.rb
+
+Style/GlobalVars:
+  Exclude:
+    # We have some "interesting" monkey patching in this file
+    # and we need to sneak in something that will work across odd scopes.
+    # The global variable is only used/referenced from this file,
+    # so we can get away with it.
+    - config/initializers/currency.rb
+
+# This is tied to Rails 5, which we don't use
+Rails/HttpPositionalArguments:
+  Description: 'Use keyword arguments instead of positional arguments in http method calls.'
+  Enabled: false
+  VersionAdded: '0.44'
+  Include:
+    - 'spec/**/*'
+    - 'test/**/*'
+
+Layout/SpaceAroundEqualsInParameterDefault:
+  Description: >-
+    Checks that the equals signs in parameter default assignments
+    have or don't have surrounding space depending on
+    configuration.
+  StyleGuide: '#spaces-around-equals'
+  Enabled: true
+  VersionAdded: '0.49'
+  EnforcedStyle: no_space
+  SupportedStyles:
+    - space
+    - no_space
+
+Layout/DotPosition:
+  Description: 'Checks the position of the dot in multi-line method calls.'
+  StyleGuide: '#consistent-multi-line-chains'
+  Enabled: true
+  VersionAdded: '0.49'
+  EnforcedStyle: trailing
+  SupportedStyles:
+    - leading
+    - trailing
+
+Layout/SpaceInsideHashLiteralBraces:
+  Description: "Use spaces inside hash literal braces - or don't."
+  StyleGuide: '#spaces-operators'
+  Enabled: true
+  VersionAdded: '0.49'
+  EnforcedStyle: no_space
+  SupportedStyles:
+    - space
+    - no_space
+    # 'compact' normally requires a space inside hash braces, with the exception
+    # that successive left braces or right braces are collapsed together
+    - compact
+  EnforcedStyleForEmptyBraces: no_space
+  SupportedStylesForEmptyBraces:
+    - space
+    - no_space
+
+Naming/RescuedExceptionsVariableName:
+  Description: 'Use consistent rescued exceptions variables naming.'
+  Enabled: true
+  VersionAdded: '0.67'
+  VersionChanged: '0.68'
+  PreferredName: exception
+
+Layout/ArgumentAlignment:
+  Description: >-
+    Align the arguments of a method call if they span more
+    than one line.
+  StyleGuide: '#no-double-indent'
+  Enabled: true
+  VersionAdded: '0.68'
+  # Alignment of arguments in multi-line method calls.
+  #
+  # The `with_first_argument` style aligns the following lines along the same
+  # column as the first parameter.
+  #
+  #     method_call(a,
+  #                 b)
+  #
+  # The `with_fixed_indentation` style aligns the following lines with one
+  # level of indentation relative to the start of the line with the method call.
+  #
+  #     method_call(a,
+  #       b)
+  EnforcedStyle: with_fixed_indentation
+  SupportedStyles:
+    - with_first_argument
+    - with_fixed_indentation
+  # By default, the indentation width from Layout/IndentationWidth is used
+  # But it can be overridden by setting this parameter
+  IndentationWidth: ~
+
+Style/NilComparison:
+  Description: 'Prefer x.nil? to x == nil.'
+  StyleGuide: '#predicate-methods'
+  Enabled: true
+  VersionAdded: '0.12'
+  VersionChanged: '0.59'
+  EnforcedStyle: predicate
+  SupportedStyles:
+    - predicate
+    - comparison
+  Exclude:
+    - 'spec/**/*_spec.rb'
+
+# RSpec/HookArgument:
+#   Description: Checks the arguments passed to `before`, `around`, and `after`.
+#   Enabled: true
+#   EnforcedStyle: each
+#   SupportedStyles:
+#     - implicit
+#     - each
+#     - example
+#   StyleGuide: http://www.rubydoc.info/gems/rubocop-rspec/RuboCop/Cop/RSpec/HookArgument
+
+Style/BlockDelimiters:
+  Description: >-
+    Avoid using {...} for multi-line blocks (multiline chaining is
+    always ugly).
+    Prefer {...} over do...end for single-line blocks.
+  StyleGuide: '#single-line-blocks'
+  Enabled: true
+  VersionAdded: '0.30'
+  VersionChanged: '0.35'
+  EnforcedStyle: braces_for_chaining
+  SupportedStyles:
+    # The `line_count_based` style enforces braces around single line blocks and
+    # do..end around multi-line blocks.
+    - line_count_based
+    # The `semantic` style enforces braces around functional blocks, where the
+    # primary purpose of the block is to return a value and do..end for
+    # multi-line procedural blocks, where the primary purpose of the block is
+    # its side-effects. Single-line procedural blocks may only use do-end,
+    # unless AllowBracesOnProceduralOneLiners has a truthy value (see below).
+    #
+    # This looks at the usage of a block's method to determine its type (e.g. is
+    # the result of a `map` assigned to a variable or passed to another
+    # method) but exceptions are permitted in the `ProceduralMethods`,
+    # `FunctionalMethods` and `IgnoredMethods` sections below.
+    - semantic
+    # The `braces_for_chaining` style enforces braces around single line blocks
+    # and do..end around multi-line blocks, except for multi-line blocks whose
+    # return value is being chained with another method (in which case braces
+    # are enforced).
+    - braces_for_chaining
+    # The `always_braces` style always enforces braces.
+    - always_braces
+  ProceduralMethods:
+    # Methods that are known to be procedural in nature but look functional from
+    # their usage, e.g.
+    #
+    #   time = Benchmark.realtime do
+    #     foo.bar
+    #   end
+    #
+    # Here, the return value of the block is discarded but the return value of
+    # `Benchmark.realtime` is used.
+    - benchmark
+    - bm
+    - bmbm
+    - create
+    - each_with_object
+    - measure
+    - new
+    - realtime
+    - tap
+    - with_object
+  FunctionalMethods:
+    # Methods that are known to be functional in nature but look procedural from
+    # their usage, e.g.
+    #
+    #   let(:foo) { Foo.new }
+    #
+    # Here, the return value of `Foo.new` is used to define a `foo` helper but
+    # doesn't appear to be used from the return value of `let`.
+    - let
+    - let!
+    - subject
+    - watch
+  AllowBracesOnProceduralOneLiners: false
+
+Style/BarePercentLiterals:
+  Description: 'Checks if usage of %() or %Q() matches configuration.'
+  StyleGuide: '#percent-q-shorthand'
+  Enabled: true
+  VersionAdded: '0.25'
+  EnforcedStyle: percent_q
+  SupportedStyles:
+    - percent_q
+    - bare_percent
+
+Layout/MultilineMethodCallBraceLayout:
+  Description: >-
+    Checks that the closing brace in a method call is
+    either on the same line as the last method argument, or
+    a new line.
+  Enabled: true
+  VersionAdded: '0.49'
+  EnforcedStyle: new_line
+  SupportedStyles:
+    # symmetrical: closing brace is positioned in same way as opening brace
+    # new_line: closing brace is always on a new line
+    # same_line: closing brace is always on the same line as last argument
+    - symmetrical
+    - new_line
+    - same_line
+
+Style/Alias:
+  Description: 'Use alias instead of alias_method.'
+  StyleGuide: '#alias-method'
+  Enabled: true
+  VersionAdded: '0.9'
+  VersionChanged: '0.36'
+  EnforcedStyle: prefer_alias_method
+  SupportedStyles:
+    - prefer_alias
+    - prefer_alias_method
+
+Style/TrailingCommaInArrayLiteral:
+  Description: 'Checks for trailing comma in array literals.'
+  StyleGuide: '#no-trailing-array-commas'
+  Enabled: true
+  VersionAdded: '0.53'
+  # but only when each item is on its own line.
+  # If `consistent_comma`, the cop requires a comma after the last item of all
+  # non-empty array literals.
+  EnforcedStyleForMultiline: no_comma
+  SupportedStylesForMultiline:
+    - comma
+    - consistent_comma
+    - no_comma
+
+Style/TrailingCommaInHashLiteral:
+  Description: 'Checks for trailing comma in hash literals.'
+  Enabled: true
+  # If `comma`, the cop requires a comma after the last item in a hash,
+  # but only when each item is on its own line.
+  # If `consistent_comma`, the cop requires a comma after the last item of all
+  # non-empty hash literals.
+  EnforcedStyleForMultiline: no_comma
+  SupportedStylesForMultiline:
+    - comma
+    - consistent_comma
+    - no_comma
+  VersionAdded: '0.53'
+
+Rails/HttpStatus:
+  Description: 'Enforces use of symbolic or numeric value to define HTTP status.'
+  Enabled: true
+  VersionAdded: '0.54'
+  EnforcedStyle: symbolic
+  SupportedStyles:
+    - numeric
+    - symbolic
+
+Style/EmptyMethod:
+  Description: 'Checks the formatting of empty method definitions.'
+  StyleGuide: '#no-single-line-methods'
+  Enabled: true
+  VersionAdded: '0.46'
+  EnforcedStyle: expanded
+  SupportedStyles:
+    - compact
+    - expanded
+
+Style/WhileUntilModifier:
+  Description: >-
+    Favor modifier while/until usage when you have a
+    single-line body.
+  StyleGuide: '#while-as-a-modifier'
+  Enabled: false
+  VersionAdded: '0.9'
+  VersionChanged: '0.30'
+
+Style/FormatString:
+  Description: 'Enforce the use of Kernel#sprintf, Kernel#format or String#%.'
+  StyleGuide: '#sprintf'
+  Enabled: true
+  VersionAdded: '0.19'
+  VersionChanged: '0.49'
+  EnforcedStyle: sprintf
+  SupportedStyles:
+    - format
+    - sprintf
+    - percent
+
+Rails/Delegate:
+  Description: 'Prefer delegate method for delegations.'
+  Enabled: false
+  VersionAdded: '0.21'
+  VersionChanged: '0.50'
+  # When set to true, using the target object as a prefix of the
+  # method name without using the `delegate` method will be a
+  # violation. When set to false, this case is legal.
+  EnforceForPrefixed: true
+
+# Performance/Casecmp:
+#   Description: >-
+#     Use `casecmp` rather than `downcase ==`, `upcase ==`, `== downcase`, or `== upcase`..
+#   Reference: 'https://github.com/JuanitoFatas/fast-ruby#stringcasecmp-vs-stringdowncase---code'
+#   Enabled: false
+#   VersionAdded: '0.36'
+
+Layout/MultilineOperationIndentation:
+  Description: >-
+    Checks indentation of binary operations that span more than
+    one line.
+  Enabled: true
+  VersionAdded: '0.49'
+  EnforcedStyle: indented
+  SupportedStyles:
+    - aligned
+    - indented
+  # By default, the indentation width from `Layout/IndentationWidth` is used
+  # But it can be overridden by setting this parameter
+  IndentationWidth: ~
+
+Layout/ParameterAlignment:
+  Description: >-
+    Align the parameters of a method definition if they span more
+    than one line.
+  StyleGuide: '#no-double-indent'
+  Enabled: true
+  VersionAdded: '0.49'
+  VersionChanged: '0.68'
+  # Alignment of parameters in multi-line method calls.
+  #
+  # The `with_first_parameter` style aligns the following lines along the same
+  # column as the first parameter.
+  #
+  #     def method_foo(a,
+  #                    b)
+  #
+  # The `with_fixed_indentation` style aligns the following lines with one
+  # level of indentation relative to the start of the line with the method call.
+  #
+  #     def method_foo(a,
+  #       b)
+  EnforcedStyle: with_fixed_indentation
+  SupportedStyles:
+    - with_first_parameter
+    - with_fixed_indentation
+  # By default, the indentation width from Layout/IndentationWidth is used
+  # But it can be overridden by setting this parameter
+  IndentationWidth: ~
+
+# RSpec/ExpectChange:
+#   Description: Checks for consistent style of change matcher.
+#   Enabled: true
+#   EnforcedStyle: block
+#   SupportedStyles:
+#     - method_call
+#     - block
+#   StyleGuide: http://www.rubydoc.info/gems/rubocop-rspec/RuboCop/Cop/RSpec/ExpectChange
+
+Layout/MultilineArrayBraceLayout:
+  Description: >-
+    Checks that the closing brace in an array literal is
+    either on the same line as the last array element, or
+    a new line.
+  Enabled: true
+  VersionAdded: '0.49'
+  EnforcedStyle: symmetrical
+  SupportedStyles:
+    # symmetrical: closing brace is positioned in same way as opening brace
+    # new_line: closing brace is always on a new line
+    # same_line: closing brace is always on the same line as last element
+    - symmetrical
+    - new_line
+    - same_line
+
+Style/TrailingUnderscoreVariable:
+  Description: >-
+    Checks for the usage of unneeded trailing underscores at the
+    end of parallel variable assignment.
+  AllowNamedUnderscoreVariables: true
+  Enabled: false
+  VersionAdded: '0.31'
+  VersionChanged: '0.35'
+
+Layout/SpaceBeforeFirstArg:
+  Description: >-
+    Checks that exactly one space is used between a method name
+    and the first argument for method calls without parentheses.
+  Enabled: true
+  VersionAdded: '0.49'
+  # When `true`, allows most uses of extra spacing if the intent is to align
+  # things with the previous or next line, not counting empty lines or comment
+  # lines.
+  AllowForAlignment: false
+
+Style/NumericLiteralPrefix:
+  Description: 'Use smallcase prefixes for numeric literals.'
+  StyleGuide: '#numeric-literal-prefixes'
+  Enabled: true
+  VersionAdded: '0.41'
+  EnforcedOctalStyle: zero_only
+  SupportedOctalStyles:
+    - zero_with_o
+    - zero_only
+
+Layout/FirstHashElementLineBreak:
+  Description: >-
+    Checks for a line break before the first element in a
+    multi-line hash.
+  Enabled: true
+  VersionAdded: '0.49'
+
+Layout/MultilineHashBraceLayout:
+  Description: >-
+    Checks that the closing brace in a hash literal is
+    either on the same line as the last hash element, or
+    a new line.
+  Enabled: true
+  VersionAdded: '0.49'
+  EnforcedStyle: symmetrical
+  SupportedStyles:
+    # symmetrical: closing brace is positioned in same way as opening brace
+    # new_line: closing brace is always on a new line
+    # same_line: closing brace is always on same line as last element
+    - symmetrical
+    - new_line
+    - same_line
+
+Layout/MultilineHashKeyLineBreaks:
+  Description: >-
+    Checks that each item in a multi-line hash literal
+    starts on a separate line.
+  Enabled: true
+  VersionAdded: '0.67'
+
+Layout/MultilineMethodArgumentLineBreaks:
+  Description: >-
+    Checks that each argument in a multi-line method call
+    starts on a separate line.
+  Enabled: true
+  VersionAdded: '0.67'
+
+Layout/MultilineArrayLineBreaks:
+  Description: >-
+    Checks that each item in a multi-line array literal
+    starts on a separate line.
+  Enabled: true
+  VersionAdded: '0.67'
+
+# This wants to change `expect(foo).to receive(bar)` to `expect(foo).to have_received(bar)`, which is not something important.
+# There appear to be some functional issues with this, so that makes it a check to be ignored.
+# RSpec/MessageSpies:
+#   Enabled: false

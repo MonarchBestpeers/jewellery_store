@@ -1,0 +1,316 @@
+#
+# These need to be checked with care
+#
+
+Rails/Date:
+  Enabled: false
+
+Rails/TimeZone:
+  Enabled: false
+
+#performance/RangeInclude:
+  # Enabled: false
+
+Rails/SkipsModelValidations:
+  Enabled: false
+
+Style/GuardClause:
+  Enabled: false
+
+Lint/AmbiguousRegexpLiteral:
+  Enabled: false
+
+Naming/MethodParameterName:
+  Enabled: false
+
+Rails/Output:
+  Enabled: false
+
+Style/IfInsideElse:
+  Enabled: false
+
+Security/Eval:
+  Enabled: false
+
+Lint/EnsureReturn:
+  Enabled: false
+
+Lint/IneffectiveAccessModifier:
+  Enabled: false
+
+Style/MultipleComparison:
+  Enabled: false
+
+Lint/UriEscapeUnescape:
+  Enabled: false
+
+Naming/AccessorMethodName:
+  Enabled: false
+
+Lint/ShadowingOuterLocalVariable:
+  Enabled: false
+
+Lint/Void:
+  Enabled: false
+
+Style/FormatStringToken:
+  Enabled: false
+
+Lint/SuppressedException:
+  Enabled: false
+
+Lint/RescueException:
+  Enabled: false
+
+Lint/AssignmentInCondition:
+  Enabled: false
+
+Lint/DuplicateMethods:
+  Enabled: false
+
+Lint/UnreachableCode:
+  Enabled: false
+
+Lint/AmbiguousOperator:
+  Enabled: false
+
+Lint/UnusedMethodArgument:
+  Enabled: false
+
+Style/CommentedKeyword:
+  Enabled: false
+
+Style/AsciiComments:
+  Enabled: false
+
+Naming/MemoizedInstanceVariableName:
+  Enabled: false
+
+#Rspec/ExampleLength:
+  # Enabled: false
+
+Style/IdenticalConditionalBranches:
+  Enabled: false
+
+Lint/UnderscorePrefixedVariableName:
+  Enabled: false
+
+Naming/VariableNumber:
+  Enabled: false
+
+Lint/DuplicateCaseCondition:
+  Enabled: false
+
+Style/CaseEquality:
+  Enabled: false
+
+Style/AccessModifierDeclarations:
+  Enabled: false
+
+#Rspec/ContextWording:
+  # Enabled: false
+
+#Rspec/AnyInstance:
+  # Enabled: false
+
+Style/DoubleNegation:
+  Enabled: false
+
+#Rspec/MultipleDescribes:
+  # Enabled: false
+
+#Rspec/FilePath:
+  # Enabled: false
+
+#Rspec/DescribeClass:
+  # Enabled: false
+
+#performance/TimesMap:
+  # Enabled: false
+
+#performance/StartWith:
+  # Enabled: false
+
+#performance/EndWith:
+  # Enabled: false
+
+#performance/Caller:
+  # Enabled: false
+
+Style/Semicolon:
+  Enabled: false
+
+#Rspec/InstanceVariable:
+  # Enabled: false
+
+#Rspec/RepeatedDescription:
+  # Enabled: false
+
+#Rspec/MultipleExpectations:
+  # Enabled: false
+
+#Rspec/EmptyExampleGroup:
+  # Enabled: false
+
+#Rspec/NestedGroups:
+  # Enabled: false
+
+#Rspec/RepeatedExample:
+  # Enabled: false
+
+Naming/VariableName:
+  Enabled: false
+
+#Rspec/NamedSubject:
+  # Enabled: false
+
+#Rspec/LeakyConstantDeclaration:
+  # Enabled: false
+
+Lint/AmbiguousBlockAssociation:
+  Enabled: false
+
+Style/ClassCheck:
+  Enabled: false
+
+# This has potential for issues, so apply it manually
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Style/MutableConstant:
+  Exclude:
+    - lib/orsedd/plugin/payment_gateway/target_wap4080/config_profile.rb
+
+# This is risky to auto-correct and caused issues when I tried it.
+# Change this manually.
+Style/NumericPredicate:
+  Enabled: false
+
+# In a lot of places we perform explicit nil checks, rather than using .try().
+# This might be error-prone, so perform this change manually or keep it disabled.
+Style/SafeNavigation:
+  Enabled: false
+
+# This disables the use of anchors in the YML to re-use blocks internally.
+# Because we use this in various places, this is not a good one to auto-correct.
+Security/YAMLLoad:
+  Description: >-
+    Prefer usage of `YAML.safe_load` over `YAML.load` due to potential
+    security issues. See reference for more information.
+  Reference: 'https://ruby-doc.org/stdlib-2.3.3/libdoc/yaml/rdoc/YAML.html#module-YAML-label-Security'
+  Enabled: false
+  VersionAdded: '0.47'
+  SafeAutoCorrect: false
+
+Style/RedundantSelf:
+  Enabled: false
+
+Style/HashTransformKeys:
+  Enabled: true
+
+Style/HashTransformValues:
+  Enabled: true
+
+Style/RaiseArgs:
+  Enabled: false
+
+#performance/RedundantMerge:
+  # Enabled: false
+
+Rails/Present:
+  Enabled: false
+
+Rails/Presence:
+  Enabled: false
+
+Style/IfUnlessModifier:
+  Enabled: false
+
+Style/RedundantReturn:
+  Enabled: false
+
+Rails/ActiveRecordAliases:
+  Enabled: false
+
+Style/RedundantCondition:
+  Enabled: false
+
+Style/RescueModifier:
+  Enabled: false
+
+Rails/SaveBang:
+  Enabled: false
+
+# This causes errors when enabled, so handle with care and don't blindly rely on auto-correction
+Style/SymbolProc:
+  Enabled: false
+
+# We can't use find_by_* for non-AR objects, but we've used it in a few places. Don't auto-correct :-)
+Rails/DynamicFindBy:
+  Enabled: false
+
+# This does not behave cleanly for checks where the input is not always a number (such as a string_or_integer variable)
+Style/ZeroLengthPredicate:
+  Enabled: false
+
+# Double check this one later by itself... we use this in a lot of places, so is likely to cause issues when corrected.
+Style/PerlBackrefs:
+  Enabled: false
+
+# Another one that would be better to unravel by itself
+Style/NestedModifier:
+  Enabled: false
+
+Style/IfUnlessModifierOfIfUnless:
+  Enabled: false
+
+#performance/RedundantBlockCall:
+  # Enabled: false
+
+# In a few places we might have methods with the same name as local variables, so fixing this could cause issues.
+Style/MethodCallWithoutArgsParentheses:
+  Enabled: false
+
+# It looks like this alerts in places where it would change the meaning of the code. Be very careful!
+Style/RedundantConditional:
+  Enabled: false
+
+#Rspec/SharedContext:
+  # Enabled: false
+
+#
+# These will need good care and sane values
+#
+
+Metrics/LineLength:
+  Enabled: false
+
+Metrics/AbcSize:
+  Enabled: false
+
+Metrics/MethodLength:
+  Enabled: false
+
+Naming/PredicateName:
+  Enabled: false
+
+Metrics/PerceivedComplexity:
+  Enabled: false
+
+Metrics/ClassLength:
+  Enabled: false
+
+Metrics/CyclomaticComplexity:
+  Enabled: false
+
+Metrics/BlockLength:
+  Enabled: false
+
+Metrics/ModuleLength:
+  Enabled: false
+
+Metrics/ParameterLists:
+  Enabled: false
+
+Metrics/BlockNesting:
+  Enabled: false
