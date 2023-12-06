@@ -1,0 +1,12 @@
+<!-- app/views/users/show_favorites.html.erb -->
+<h1><%= @user.email %>'s Favorite Products</h1>
+
+<% if @favorite_products.any? %>
+  <ul>
+    <% @favorite_products.each do |product| %>
+      <li><%= link_to product.name, product %></li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>No favorite products yet.</p>
+<% end %>
