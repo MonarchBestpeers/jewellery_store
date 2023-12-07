@@ -1,43 +1,54 @@
 <% flash.each do |message_type, message| %>
-  <%= content_tag(:div, message,  class: "alert alert-#{message_type}", role: "alert") %>
+  <div class="alert alert-<%= message_type %> alert-dismissible fade show" role="alert">
+    <%= message %>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
 <% end %>
-<%if user_signed_in?%>
-  <%= button_to "logout", destroy_user_session_path, method: :delete, class: 'btn btn-danger'%>
-  <%= button_to "Show Favorites", show_favorites_user_path(current_user.id), method: :get, class: 'btn btn-info'%>
-<%else%>
-  <%= button_to "login", new_user_session_path, method: :get, class: 'btn btn-success'%>
-  <%= button_to "Signup", new_user_registration_path, method: :get, class: 'btn btn-secondary'%>
-<%end%>
 
-<%= link_to 'New Product', new_product_path %>
-<div class="container mt-5">
-  <h1 class="display-4 mb-4">All Products</h1>
+<% if user_signed_in? %>
+  <div class="d-flex justify-content-end">
+    <%= button_to "Logout", destroy_user_session_path, method: :delete, class: 'btn btn-danger me-2' %>
+    <%= button_to "Show Favorites : #{current_user.favorites.count}", show_favorites_user_path(current_user.id), method: :get, class: 'btn btn-info' %>
+  </div>
+<% else %>
+  <div class="d-flex justify-content-end">
+    <%= button_to "Login", new_user_session_path, method: :get, class: 'btn btn-success me-2' %>
+    <%= button_to "Signup", new_user_registration_path, method: :get, class: 'btn btn-secondary' %>
+  </div>
+<% end %>
+
+<%= link_to 'New Product', new_product_path, class: 'btn btn-primary mb-3' %>
+
+<div class="container mt-4">
+  <h1 class="display-4 mb-4 text-center">All Products</h1>
 
   <div class="row row-cols-1 row-cols-md-3 g-4">
     <% @products.each do |product| %>
       <div class="col">
         <div class="card h-100">
-          <% if product.image.present?%>
+          <% if product.image.present? %>
             <%= image_tag product.image, class: 'card-img-top', alt: 'Product Image' %>
-          <%end%>
+          <% end %>
           <div class="card-body">
             <h5 class="card-title"><%= product.name %></h5>
             <p class="card-text"><%= product.description %></p>
             <p class="card-text"><strong>Price:</strong> <%= number_to_currency(product.price) %></p>
-            <%= link_to 'Details', product_path(product), class: 'btn btn-primary' %>
-            <% if user_signed_in?%>
-              <%= link_to 'Edit', edit_product_path(product), class: 'btn btn-secondary me-2' %>
-              <%= button_to 'Delete', product, method: :delete, data: { turbo_confirm: 'Are you sure?' }, class: 'btn btn-danger', remote: true %>
-            <%end%>
-          <% if user_signed_in? %>
-            <% if current_user.favorited_products.include?(product) %>
-              <%= button_to "Remove from Favorites", unfavorite_product_path(product), method: :delete, class: 'btn btn-danger' %>
-              <%= raw File.read(Rails.root.join('app/assets/images/favorite_black_24dp.svg')) %>
-            <% else %>
-              <%= button_to 'Add to Favorites', favorite_product_path(product), method: :post, class: 'btn btn-primary' %>
-              <%= raw File.read(Rails.root.join('app/assets/images/favorite_border_black_24dp.svg')) %>
-            <% end %>
-          <% end %>
+            <div>
+              <%= link_to 'Details', product_path(product), class: 'btn btn-primary' %>
+                <% if user_signed_in? %>
+                  <%= link_to 'Edit', edit_product_path(product), class: 'btn btn-secondary me-2' %>
+                  <%= link_to 'Delete', product, data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: 'btn btn-danger', remote: true %>
+                <% end %>
+                <% if user_signed_in? && current_user.favorited_products.include?(product) %>
+                  <%= link_to unfavorite_product_path(product), data: { turbo_method: :delete } do %>
+                    <%= raw File.read(Rails.root.join('app/assets/images/heart.svg')) %>
+                  <% end %>
+                <% else %>
+                  <%= link_to favorite_product_path(product), data: { turbo_method: :post } do %>
+                    <%= raw File.read(Rails.root.join('app/assets/images/heart_blank.svg')) %>
+                  <% end %>
+                <% end %>
+            </div>
           </div>
         </div>
       </div>
