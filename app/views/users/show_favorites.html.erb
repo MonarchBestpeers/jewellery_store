@@ -1,12 +1,39 @@
 <!-- app/views/users/show_favorites.html.erb -->
-<h1><%= @user.email %>'s Favorite Products</h1>
+<div class="container mt-4">
+  <h1 class="display-4 mb-4 text-center"><%= @user.email %>'s Favorite Products</h1>
 
-<% if @favorite_products.any? %>
-  <ul>
-    <% @favorite_products.each do |product| %>
-      <li><%= link_to product.name, product %></li>
-    <% end %>
-  </ul>
-<% else %>
-  <p>No favorite products yet.</p>
-<% end %>
+  <% if @favorite_products.any? %>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+      <% @favorite_products.each do |product| %>
+        <div class="col">
+          <div class="card h-100">
+            <h5 class="card-title text-center"><%= product.name %></h5>
+
+            <div class="card-body">
+              <% if product.image.present? %>
+                <%= image_tag product.image, alt: 'Product Image', class: 'card-img-top mb-3' %>
+              <% else %>
+                <p class="card-text text-muted">No Image Found</p>
+              <% end %>
+
+              <p class="card-text"><strong>Description:</strong> <%= product.description %></p>
+              <p class="card-text"><strong>Price:</strong> <%= number_to_currency(product.price) %></p>
+              <p class="card-text"><strong>Quantity Available:</strong> <%= product.quantity_available %></p>
+              <p class="card-text"><strong>Material:</strong> <%= product.material %></p>
+            </div>
+
+            <div class="card-footer text-center">
+              <%= link_to unfavorite_product_path(product), data: { turbo_method: :delete } do %>
+                <%= raw File.read(Rails.root.join('app/assets/images/heart.svg')) %>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="text-center">
+      <p class="lead">No favorite products yet.</p>
+    </div>
+  <% end %>
+</div>
