@@ -5,53 +5,9 @@
   </div>
 <% end %>
 
-<% if user_signed_in? %>
-  <div class="d-flex justify-content-end">
-    <%= button_to "Logout", destroy_user_session_path, method: :delete, class: 'btn btn-danger me-2' %>
-    <%= button_to "Show Favorites : #{current_user.favorites.count}", show_favorites_user_path(current_user.id), method: :get, class: 'btn btn-info' %>
-  </div>
-<% else %>
-  <div class="d-flex justify-content-end">
-    <%= button_to "Login", new_user_session_path, method: :get, class: 'btn btn-success me-2' %>
-    <%= button_to "Signup", new_user_registration_path, method: :get, class: 'btn btn-secondary' %>
-  </div>
-<% end %>
-
 <%= link_to 'New Product', new_product_path, class: 'btn btn-primary mb-3' %>
 
 <div class="container mt-4">
   <h1 class="display-4 mb-4 text-center">All Products</h1>
-
-  <div class="row row-cols-1 row-cols-md-3 g-4">
-    <% @products.each do |product| %>
-      <div class="col">
-        <div class="card h-100">
-          <% if product.image.present? %>
-            <%= image_tag product.image, class: 'card-img-top', alt: 'Product Image' %>
-          <% end %>
-          <div class="card-body">
-            <h5 class="card-title"><%= product.name %></h5>
-            <p class="card-text"><%= product.description %></p>
-            <p class="card-text"><strong>Price:</strong> <%= number_to_currency(product.price) %></p>
-            <div>
-              <%= link_to 'Details', product_path(product), class: 'btn btn-primary' %>
-                <% if user_signed_in? %>
-                  <%= link_to 'Edit', edit_product_path(product), class: 'btn btn-secondary me-2' %>
-                  <%= link_to 'Delete', product, data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: 'btn btn-danger', remote: true %>
-                <% end %>
-                <% if user_signed_in? && current_user.favorited_products.include?(product) %>
-                  <%= link_to unfavorite_product_path(product), data: { turbo_method: :delete } do %>
-                    <%= raw File.read(Rails.root.join('app/assets/images/heart.svg')) %>
-                  <% end %>
-                <% else %>
-                  <%= link_to favorite_product_path(product), data: { turbo_method: :post } do %>
-                    <%= raw File.read(Rails.root.join('app/assets/images/heart_blank.svg')) %>
-                  <% end %>
-                <% end %>
-            </div>
-          </div>
-        </div>
-      </div>
-    <% end %>
-  </div>
+  <%= render 'result' %>
 </div>
