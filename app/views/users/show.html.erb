@@ -1,0 +1,26 @@
+<!-- app/views/users/show.html.erb -->
+
+<div class="user-profile">
+  <h1>User Profile</h1>
+
+  <div class="profile-info">
+    <% if @user.avatar.attached? %>
+      <%= image_tag @user.avatar, class: 'avatar' %>
+    <% else %>
+      <p>No profile photo available.</p>
+    <% end %>
+
+    <p><strong>Name:</strong> <%= @user.name %></p>
+    <p><strong>Age:</strong> <%= @user.age %></p>
+    <p><strong>Country:</strong> <%= @user.country %></p>
+    <p><strong>Contact Details:</strong> <%= @user.email %></p>
+    <p><strong>Email:</strong> <%= @user.email %></p>
+    <p><strong>Created At:</strong> <%= @user.created_at.strftime('%B %d, %Y %I:%M %p') %></p>
+    <p><strong>Last Sign In:</strong> <%= @user.last_sign_in_at ? @user.last_sign_in_at.strftime('%B %d, %Y %I:%M %p') : 'Never' %></p>
+    <p><strong>Sign In Count:</strong> <%= @user.sign_in_count %></p>
+    <!-- Add more fields as needed -->
+  </div>
+
+  <%= link_to 'Edit Profile', edit_user_path(@user), class: 'btn user_btn btn-primary' %>
+
+</div>

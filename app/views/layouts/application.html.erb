@@ -47,9 +47,10 @@
     </nav>
 
     <% if user_signed_in? %>
-      <p>Welcome : <%= current_user.email%></p>
-      <p>Last login activity : <%= current_user.last_sign_in_at%></p>
+      <p>Welcome : <%= current_user.name%></p>
+      <p>Last login activity : <%= current_user.last_sign_in_at ? current_user.last_sign_in_at.strftime('%B %d, %Y %I:%M %p') : 'Never'%></p>
       <div class="d-flex justify-content-end">
+        <%= button_to 'My Profile', user_path(current_user), method: :get, class: 'btn btn-info me2'%>
         <%= button_to "Logout", destroy_user_session_path, method: :delete, class: 'btn btn-danger me-2' %>
         <%= button_to "Show Favorites : #{current_user.favorites.count}", show_favorites_user_path(current_user.id), method: :get, class: 'btn btn-info' %>
         <%= link_to "Show Cart", cart_path%>
