@@ -1,0 +1,40 @@
+<!-- app/views/carts/show.html.erb -->
+<div class="container mt-4">
+  <h1 class="display-4 mb-4 text-center">Your Shopping Cart</h1>
+
+  <% if @cart_items.any? %>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Description</th>
+          <th>Price</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @cart_items.each do |cart_item| %>
+          <tr>
+            <td><%= cart_item.product.name %></td>
+            <td><%= cart_item.product.description %></td>
+            <td><%= number_to_currency(cart_item.product.price) %></td>
+            <td>
+              <%= link_to 'Remove from Cart', remove_from_cart_cart_path(cart_item.product), data: { turbo_method: :delete }, class: 'btn btn-danger btn-sm' %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <div class="text-end">
+      <% total_price = @cart_items.sum { |cart_item| cart_item.product.price.to_f } %>
+      <strong>Total:</strong> <%= number_to_currency(total_price) %>
+    </div>
+  <% else %>
+    <div class="text-center">
+      <p class="lead">Your cart is empty.</p>
+    </div>
+  <% end %>
+
+  <%= link_to 'Continue Shopping', root_path, class: 'btn btn-secondary' %>
+</div>

@@ -7,6 +7,12 @@ class ProductsController < ApplicationController
 
   def show
     @product = Product.find_by_id(params[:id])
+
+    if @product
+      @product
+    else
+      render file: "#{Rails.root}/public/404.html", layout: false
+    end
   end
 
   def new
@@ -16,11 +22,13 @@ class ProductsController < ApplicationController
   def create
     @product = Product.new(product_params)
 
-    if @product.save
+    if @product.save && product_params[:price].to_i >= 0
       respond_to do |format|
         format.html { redirect_to products_url, notice: 'Product was successfully created.' }
         format.json { head :no_content }
       end
+    else
+      render :new, status: :unprocessable_entity
     end
   end
 
@@ -31,11 +39,13 @@ class ProductsController < ApplicationController
   def update
     @product = Product.find_by_id(params[:id])
 
-    if @product.update(product_params)
+    if @product.update(product_params) && product_params[:price].to_i >= 0
       respond_to do |format|
-        format.html { redirect_to products_url, notice: 'Product was successfully created.' }
+        format.html { redirect_to products_url, notice: 'Product was successfully updated.' }
         format.json { head :no_content }
       end
+    else
+      render file: "#{Rails.root}/public/422.html", layout: false
     end
   end
 
@@ -63,9 +73,15 @@ class ProductsController < ApplicationController
     redirect_to products_path, notice: 'Product removed from favorites.'
   end
 
+  def search
+    @products = Product.where('name like ?', "%#{params[:query]}%")
+
+    render :search
+  end
+
   private
 
   def product_params
-    params.require(:product).permit(:name, :description, :price, :image)
+    params.require(:product).permit(:name, :description, :price, :image, :material, :quantity_available)
   end
 end

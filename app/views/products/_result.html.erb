@@ -1,0 +1,37 @@
+ <div class="row row-cols-1 row-cols-md-3 g-4">
+    <% @products.each do |product| %>
+      <div class="col">
+        <div class="card h-100">
+          <% if product.image.present? %>
+            <%= image_tag product.image, class: 'card-img-top', alt: 'Product Image' %>
+          <% end %>
+          <div class="card-body">
+            <h5 class="card-title"><%= product.name %></h5>
+            <p class="card-text"><%= product.description %></p>
+            <p class="card-text"><strong>Price:</strong> <%= number_to_currency(product.price) %></p>
+            <div>
+              <%= link_to 'Details', product_path(product), class: 'btn btn-primary' %>
+                <% if user_signed_in? %>
+                  <%= link_to 'Edit', edit_product_path(product), class: 'btn btn-secondary me-2' %>
+                  <%= link_to 'Delete', product, data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: 'btn btn-danger', remote: true %>
+                <% end %>
+                <% if user_signed_in? && current_user.favorited_products.include?(product) %>
+                  <%= link_to unfavorite_product_path(product), data: { turbo_method: :delete } do %>
+                    <%= raw File.read(Rails.root.join('app/assets/images/heart.svg')) %>
+                  <% end %>
+                <% else %>
+                  <%= link_to favorite_product_path(product), data: { turbo_method: :post } do %>
+                    <%= raw File.read(Rails.root.join('app/assets/images/heart_blank.svg')) %>
+                  <% end %>
+                <% end %>
+                <% if user_signed_in? && current_user.cart.products.include?(product)%>
+                  <%= link_to "Remove from Cart", remove_from_cart_cart_path({product_id: product, user_id: current_user}), data: { turbo_method: :delete }, class: 'btn btn-danger'%>
+                <%else%>
+                  <%= link_to "Add to Cart", add_to_cart_cart_path({product_id: product, user_id: current_user}), data: { turbo_method: :post }, class: 'btn btn-info'%>
+                <%end%>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>

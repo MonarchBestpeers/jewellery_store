@@ -1,0 +1,6 @@
+<% if @products.any?%>
+<p>Search Results for: <%= params[:query] %></p>
+  <%= render 'result'%>
+<%else%>
+  <p>No results found for the <%= params[:query]%></p>
+<%end%>

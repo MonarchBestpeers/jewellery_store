@@ -21,3 +21,18 @@
 .card:hover {
   transform: scale(1.05);
 }
+
+/* app/assets/stylesheets/application.scss (or your custom stylesheet) */
+.cart-icon {
+  max-width: 50px; /* Set a maximum width for the cart icon */
+  transition: max-width 0.3s ease; /* Add a smooth transition effect */
+}
+
+/* Adjust the cart icon size based on the number of items in the cart */
+.cart-icon.large {
+  max-width: 70px;
+}
+
+.cart-icon.extra-large {
+  max-width: 100px;
+}
