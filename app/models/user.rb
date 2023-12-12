@@ -6,4 +6,5 @@ class User < ApplicationRecord
   has_many :favorites
   has_many :favorited_products, through: :favorites, source: :product
   has_one :cart
+  has_one_attached :avatar
 end
